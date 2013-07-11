@@ -1,0 +1,113 @@
+.resolved
+{
+	color: white;
+	background: green;
+	padding: 5px 10px;
+}
+
+.unresolved
+{
+	color: white;
+	background: orange;
+	padding: 5px 10px;
+}
+
+.ok
+{
+	color: gray;
+}
+
+#collaboration
+{
+	position: absolute;
+	right: 30px;
+	top: 10px;
+}
+
+#collaboration #memberListWrapper
+{
+	display:none;
+	background: white;
+	border: solid 1px #333;
+	position: absolute;
+	width: 140px;
+	right: 0px;
+	top: 40px;
+}
+
+#collaboration #memberListWrapper h5
+{
+	color: white;
+	background: #666;
+	margin: 0;
+	padding: 3px;
+	text-align: center;
+}
+
+#collaboration ul
+{
+	padding: 8px 0 0 0;
+	list-style-type: none;
+}
+
+#comments .scrolling
+{
+	overflow-y: scroll;
+	height: 270px;
+}
+
+h1
+{
+	text-indent: -1000px;
+	background-image: url(../img/corefiling.gif);
+	background-repeat: no-repeat;
+	background-position: 20px 0px;
+	line-height: 60px;
+}
+
+#menu
+{
+	background: #333333;
+	padding: 4px 8px 4px 0;
+}
+
+#menu a
+{
+	color: #fff;
+	display: block;
+	float: left;
+	margin: 0 6px;
+}
+
+#menu p
+{
+	padding: 0;
+	margin: 0;
+}
+
+div.space
+{
+	height: 400px;
+	margin: 0;
+}
+
+#browser
+{
+	width: 20%;
+	float: left;
+	border-right: solid 4px #333;
+	height: 1000px;
+	padding: 0 32px;
+}
+
+#details
+{
+	width: 67%;
+	float: left;
+	padding: 0 32px;
+}
+
+#comments li
+{
+	list-style-type: none;
+}

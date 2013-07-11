@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Corefiling Demonstration</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+		<link href="css/styles.css" rel="stylesheet" media="screen" />
+		<link href="css/redmond/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" media="screen" />
+	</head>
+	<body>
+		<h1>Corefiling</h1>
+		<div id="collaboration">
+			<div id="username">Connecting...</div>
+			<a href='#' id='otherviewers'></a>
+			<div id='memberListWrapper'>
+				<h5>Members online</h5>
+				<ul id='memberList'>
+				</ul>
+			</div>
+		</div>
+		<div class="row" id="menu">
+			<p class="pull-right">
+				<a href="#">About</a>&nbsp;<a href="#">Logout</a>
+			</p>
+		</div>
+		<div class="row">
+			<div class="space" id="browser">
+				<h3>Network Browser</h3>
+				<div id="taxonomy">
+					<ul>
+						<li id="phtml_1">
+							<a href="#">Root node 1</a>
+							<ul>
+								<li><a href="#">Child node 1</a></li>
+								<li><a href="#">Child node 2</a></li>
+								<li><a href="#">Child node 2</a></li>
+								<li><a href="#">Child node 3</a></li>
+							</ul>
+						</li>
+						<li id="phtml_2">
+							<a href="#">Root node 2</a>
+							<ul>
+								<li><a href="#">Child node 1</a></li>
+								<li><a href="#">Child node 2</a></li>
+								<li><a href="#">Child node 2</a></li>
+								<li><a href="#">Child node 3</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="space" id="details">
+				<h3>Details</h3>
+				<h4>Properties</h4>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Property</th>
+							<th>Value</th>
+							<th>Status</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Property 1</td>
+							<td>Value 1</td>
+							<td id="status1"></td>
+							<td><a id="comments-btn" class="btn btn-info" href="#">Comment</a></td>
+						</tr>
+						<tr>
+							<td>Property 2</td>
+							<td>Value 2</td>
+							<td><span class='resolved'>Resolved</span></td>
+							<td><a class="btn btn-info" href="#">Comment</a></td>
+						</tr>
+						<tr>
+							<td>Property 3</td>
+							<td>Value 3</td>
+							<td></td>
+							<td><a class="btn btn-info" href="#">Comment</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div id="comments">
+			<div class="scrolling">
+				<ul id="commentList"></ul>
+			</div>
+			<p><input id="comment-text" type="text" placeholder="Your comment..." /><a href="#" id="add-comment" class="btn">Add</a></p>
+		</div>
+		<script src="js/jquery-1.10.2.min.js" type="text/javascript"></script>
+		<script src="js/jquery-ui-1.10.3.custom.min.js" type="text/javascript"></script>
+		<script src="js/jquery.jstree.js" type="text/javascript"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="http://js.pusher.com/2.1/pusher.min.js"></script>
+		
+		<script type="text/javascript">
+			
+			var socketId = null;
+			var username = null;
+			var chComments = null;
+			var chPresence = null;
+			
+			var PUSHER_CONFIG = {
+				APP_KEY: '<%= @app_key %>'
+			};
+			
+			// Set up Pusher logging to console
+            Pusher.log = function (message) {
+                if (window.console && window.console.log) {
+                    window.console.log(message);
+                }
+            };
+			
+			// Set callback for authentication
+			Pusher.channel_auth_endpoint = "/auth";
+			  
+			$(function () {
+				$("#taxonomy").jstree({ "core" : { "initially_open" : [ "phtml_1", "phtml_2" ] } });
+				
+				$("#comments-btn").click(function(){
+					$("#comments").dialog('open');
+				});
+				
+				$("#comments").dialog({
+				  autoOpen: false,
+				  title: "Comments",
+				  modal: true,
+				  draggable: false,
+				  minHeight: 400,
+				  minWidth: 500,
+				  buttons: [
+					{
+					  text: "Resolve",
+					  click: function() {
+						$( this ).dialog( "close" );
+					  }
+					}
+				  ]
+				}).hide();
+				
+				$('#otherviewers').click(function() {
+					if(chPresence.members.count > 1)
+					{
+						$('#memberListWrapper').toggle();
+					}
+				});
+				
+				// Connect to Pusher
+				var pusher = new Pusher(PUSHER_CONFIG.APP_KEY);
+
+				pusher.connection.bind('connected', function() {
+				  socketId = pusher.connection.socket_id;
+				  username = 'User' + socketId.substring(6);
+				  updateUser();
+				});
+	
+				chComments = pusher.subscribe('private-comments');
+
+				chComments.bind('client-newcomment', function(data) {
+					addComment(data.username, data.comment);
+				});
+				
+				chPresence = pusher.subscribe('presence-app');
+				
+				chPresence.bind('pusher:subscription_succeeded', function() {
+					updateMemberList();
+				});
+				
+				chPresence.bind('pusher:member_added', function(member) {
+					updateMemberList();
+				});
+				
+				chPresence.bind('pusher:member_removed', function(member) {
+					updateMemberList();
+				});
+				
+				$('#add-comment').click(function(){
+					var val = $('#comment-text').val();
+					
+					if(val.length > 0)
+					{
+						chComments.trigger('client-newcomment', { username: username, comment: val });
+						$('#comment-text').val('');
+						addComment(username, val);
+					}
+				});
+				
+				updateStatus();
+				
+			});
+			
+			function updateUser()
+			{
+				$('#username').html('Hi ' + username);
+			}	
+			
+			function addComment(username, comment)
+			{
+				$('#commentList').append("<li><h5>" + username + " <span class=\"date\">9:38pm today</span></h5><p>" + comment + "</p></li>");
+				updateStatus();
+			}
+			
+			function updateStatus()
+			{
+				var count = $('#commentList').children().length;
+				
+				if(count == 0)
+				{
+					//$('#status1').html("<span class='resolved'>Resolved</span>");
+					$('#status1').html("<span class='ok'>Ok</span>");
+				}
+				else if(count == 1)
+				{
+					$('#status1').html("<span class='unresolved'>" + count + " comment</span>");
+				}
+				else
+				{
+					$('#status1').html("<span class='unresolved'>" + count + " comments</span>");
+				}
+			}
+			
+			function updateMemberList()
+			{
+				$('#memberList').empty();
+				
+				chPresence.members.each(function(member) {
+					if(member.id != socketId)
+					{
+						$('#memberList').append('<li>User' + member.id.substring(6) + '</li>')
+					}
+				});
+				
+				if(chPresence.members.count <= 1)
+				{
+					$('#otherviewers').html('No other viewers');
+				}
+				else if (chPresence.members.count == 2)
+				{
+					$('#otherviewers').html('1 other viewer &#x25BC;');
+				}
+				else
+				{
+					$('#otherviewers').html((chPresence.members.count -1) + ' other viewers &#x25BC;');
+				}
+			}
+			
+		</script>
+	</body>
+</html>
