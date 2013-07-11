@@ -27,8 +27,8 @@ function initPusher()
 
 	// --- CONNECT TO PUSHER -- //
     var pusher = new Pusher(PUSHER_CONFIG.APP_KEY, {
-        wsHost: "localhost",
-        wsPort: 8300,
+        //wsHost: "localhost",
+        //wsPort: 8300,
         authEndpoint: "/auth"
     });
 	

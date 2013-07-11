@@ -13,6 +13,8 @@ class Server < Sinatra::Base
 	Pusher.app_id = config['pusher']['app_id']
 	Pusher.key = config['pusher']['app_key']
 	Pusher.secret = config['pusher']['app_secret']
+	#Pusher.host = 'localhost'
+	#Pusher.port = 8081
 
 
 	# main view action

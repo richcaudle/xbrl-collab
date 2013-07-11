@@ -1,3 +1,7 @@
 General
 	Put on Heroku
 	
+Between Dev & Cloud
+	app.js - wsHost, wsPort
+	config.yml - switch app details
+	server.rb - Pusher.host, Pusher.port
