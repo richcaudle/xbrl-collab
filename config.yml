@@ -1,4 +1,7 @@
 pusher:
-  app_id: 49131
-  app_key: 67814c0e3263d95c854f
-  app_secret: 0dc73c45b980fd1ac22d
+  #app_id: 49131
+  #app_key: 67814c0e3263d95c854f
+  #app_secret: 0dc73c45b980fd1ac22d
+  app_id: 6
+  app_key: bca6dbf3436a6770a55e
+  app_secret: 3d599dc38f5ac3bf7cc1

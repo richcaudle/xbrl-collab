@@ -1,3 +1,9 @@
+.date
+{
+	color: gray;
+	font-size: 0.7em;
+}
+
 .resolved
 {
 	color: white;
@@ -110,4 +116,41 @@ div.space
 #comments li
 {
 	list-style-type: none;
+}
+
+#taxonomy li
+{
+	line-height: 22px;
+}
+
+#details table td
+{
+	padding: 8px 8px;
+	line-height: 32px;
+}
+
+#add-comment input, #add-comment a
+{
+	height: 28px;
+	margin: 0;
+	line-height: 28px;
+}
+
+#add-comment input
+{
+	width: 386px;
+	margin-right: 10px;
+}
+
+#comments ul
+{
+	margin: 0;
+	padding: 12px;
+}
+
+#comments li
+{
+	margin: 0;
+	padding: 0;
+	border-bottom: solid 1px #ddd;
 }

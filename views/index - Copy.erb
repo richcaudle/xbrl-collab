@@ -24,11 +24,16 @@
               }
           };
 
-          // Set callback for authentication
-          Pusher.channel_auth_endpoint = "/auth";
-    
-          // Connect to Pusher
-          var pusher = new Pusher(PUSHER_CONFIG.APP_KEY);
+          Pusher.Network = new Pusher.EventsDispatcher();
+          Pusher.Network.isOnline = function() { return true; }
+
+          // Open connection to Pusher
+          var pusher = new Pusher(PUSHER_CONFIG.APP_KEY, {
+              wsHost: "localhost",
+              wsPort: 8300,
+              authEndpoint: "/auth"
+          });
+
 
           var channel = pusher.subscribe('private-events');
 
